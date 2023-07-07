@@ -8,6 +8,7 @@ enum operation {
   VALVE,
   ARM,
   DETAIL,
+  NONE,
 };
 
 

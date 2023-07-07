@@ -17,7 +17,6 @@ ASerial::ASerial(String DD, int P, int V, int A, int Res) {
 ASerial * ASerial::instance0_;
 
 void ASerial::Start() {
-  FinishedCommand();
 }
 
 void ASerial::serialFlush() {
@@ -39,7 +38,7 @@ void ASerial::ReturnDetails() {
 
 
 void ASerial::Error(int code) {
-  Serial.println("ERR" + (String)code + "]");
+  Serial.println("[ERR" + (String)code + "]");
 }
 
 bool ASerial::GotCommand(){
@@ -58,19 +57,24 @@ bool ASerial::GotCommand(){
 
 int ASerial::process() {
   if (Serial.available() > 0) {
-    Serial.readStringUntil('[');
-    Command = Serial.readStringUntil(']');
-    Serial.println(Command);
-    Data = Command;
-    Serial.flush();
-    serialFlush();
-    return 1;
+    Command = Serial.readStringUntil("]");
+    if (Command[0] == '['){
+      Data=Command;
+      Serial.flush();
+      serialFlush();
+      return 1;
+    }
+    else {
+      Error(0);
+      serialFlush();
+      return -1;
+    }
   }
   return -1;
 }
 
 void ASerial::analyse() {
-  switch (Command[0]) {
+  switch (Command[1]) {
     case 'P':
       op = PUMP;
       Pump();
@@ -88,6 +92,7 @@ void ASerial::analyse() {
       ReturnDetails();
       break;
     default:
+      op = NONE;
       break;
   }
 }
@@ -189,6 +194,12 @@ int ASerial::GetCommand() {
   serialFlush();
   if (S == 1) {
     analyse();
+    if (op != NONE){
+      Serial.println("[VALID]");
+    }
+    else{
+      Error(1);
+    }
     return op;
   }
   return -1;

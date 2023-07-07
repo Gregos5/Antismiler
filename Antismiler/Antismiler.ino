@@ -48,8 +48,11 @@ void loop() {
         Serial.println("X position:  " + (String)Device.getArmxPos());
         Serial.println("Y position:  " + (String)Device.getArmyPos());
         break;
+      default:
+        break;
     }
     Device.FinishedCommand();
-    delay(50);
+    delay(20);
+    
   }
 }
