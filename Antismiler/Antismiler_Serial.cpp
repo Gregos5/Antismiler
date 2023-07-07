@@ -28,7 +28,7 @@ void ASerial::serialFlush() {
 }
 
 void ASerial::ReturnDetails() {
-  Serial.println(" P" + (String)NumPump +
+  Serial.println("[P" + (String)NumPump +
                  " V" + (String)NumValve +
                  " A" + (String)NumArm +
                  " (" + DeviceDesc + ")]");

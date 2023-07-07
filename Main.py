@@ -115,29 +115,30 @@ class Serial:
             print(cmd_list[i])
         return cmd_list
 
-    def DECODE_LINE(self, command):
-        if command[0]!="[" or command[-1]!="]":
-            return "- " + command 
+    def DECODE_LINE(self, COMMAND):
+        if COMMAND[0]!="[" or COMMAND[-1]!="]":
+            return "- " + COMMAND 
         
-        operator = MyStr(command[1:-1])
-        out = command[1:-1]
+        operator = MyStr(COMMAND[1:-1])
+        out = COMMAND[1:-1]
         match operator:
             case "ERR":
                 self.POP()
             case "FREE":
                 # Serial is now available to receive next command
                 self.state = False
+                self.OUT()
             case "VALID":
                 # POP buffer
                 self.POP()
         return out
       
-    def IN(self, device_command: list):
+    def IN(self, DEV, COMMAND):
         '''
         add new command to the buffer list
         '''
         if len(self.buffer)<self.size:
-            self.buffer.append(device_command)
+            self.buffer.append([DEV, COMMAND])
         else: 
             print("buffer full")
 
@@ -195,7 +196,7 @@ class Arm:
     def set(self, xpos, ypos):
         anglex = int(self.range_low + xpos*self.webcam_range)
         angley = int(self.range_low + ypos*self.webcam_range)
-        self.ser.IN([self.device, "[A1 X{} Y{}]".format(anglex, angley)])
+        self.ser.IN(self.device, "[A1 X{} Y{}]".format(anglex, angley))
     def get_slot(self):
         return self.current_slot
 
@@ -207,7 +208,7 @@ class Valve:
         """
         0 close, 1 open
         """
-        self.ser.IN([self.device, "[V1 S{}]".format(state)])
+        self.ser.IN(self.device, "[V1 S{}]".format(state))
 
 class Pump:
     def __init__(self,SERIAL, device):
@@ -215,7 +216,7 @@ class Pump:
         self.device = device
 
     def pump(self, volume: float):
-        self.ser.IN([self.device, "[P1 m{}]".format(volume)])
+        self.ser.IN(self.device, "[P1 m{}]".format(volume))
 
 class Smiles: 
     def __init__(self, time_limit: float, period: float):
@@ -283,14 +284,40 @@ class Smiles:
 ser = Serial()
 
 def init_module():
-    global arm, pump, ser
+    global valve, arm, pump, ser
     Ports = ser.ID_PORTS_AVAILABLE()
     print("\nSource: ", Ports)
     for Port in Ports:
         device = ser.OPEN_SERIAL_PORT(Port)
         print("\nDevice: ", device)
-        arm = Arm(ser, device)
-        pump = Pump(ser, device)
+        time.sleep(2)
+        ser.IN(device, "[D]")
+        ser.OUT()
+        while(ser.state == True):
+            details = ser.READ(device)
+            time.sleep(0.1)
+
+        details = details[0].split("(")
+        device_desc =  details[1][:-1]
+        print(device_desc)
+        details = details[0].split(" ")
+        for detail in details:
+            print(detail)
+            try:
+                op = detail[0]
+                match op:
+                    case 'A':
+                        arm = Arm(ser, device)
+                    case 'P':
+                        pump = Pump(ser, device)
+                    case 'V':
+                        valve = Valve(ser, device)
+                    case _:
+                        pass
+            except IndexError:
+                pass
+        
+        
 
 init_module()
 
