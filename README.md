@@ -48,5 +48,5 @@ The template package for the arm will include angles for both servomotors direct
 
 Responses: [ACK], [ERR], [FREE]
 
-The code is inspired from the communication protocol from my previous project, written by J. Bettles [SOURCE](https://github.com/UoM-team5/comms "Comms")
+The code is inspired from the communication protocol from my previous project, written with J. Bettles [SOURCE](https://github.com/UoM-team5/comms "Comms")
 
