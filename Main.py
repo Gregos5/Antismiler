@@ -59,6 +59,7 @@ class Serial:
     def SERIAL_WRITE_LINE(self, DEV,COMMAND):
         try:
             DEV.write(COMMAND.encode('UTF-8'))
+            self.current_device = DEV
             print(">> ", COMMAND)
             return 1
         except:
@@ -79,7 +80,6 @@ class Serial:
         TRY = 0
         while(STATE == -1):
             STATE = self.SERIAL_WRITE_LINE(DEV,COMMAND)
-            self.current_device = DEV
             TRY = TRY + 1
             if(TRY>10):
                 return -1
@@ -305,6 +305,7 @@ def init_module():
             print(detail)
             try:
                 op = detail[0]
+                num = detail[1]
                 match op:
                     case 'A':
                         arm = Arm(ser, device)
