@@ -1,7 +1,7 @@
 # Antismiler
  Arduino-controlled robot that jet-sprays liquids at un-smiling faces
 
-A full tutorial is available on my [blog post]([https://medium.com/@idanmalka2001/smile-detection-water-gun-antismiler-destroyer-293840b6b13](https://medium.com/@idanmalka2001/smile-detection-water-gun-antismiler-destroyer-293840b6b134) "Medium Blog"), Please check it out!
+A full tutorial is available on my [blog post](https://medium.com/@idanmalka2001/smile-detection-water-gun-antismiler-destroyer-293840b6b134), Please check it out!
 
 ### System Mechanism Overview
 A camera feed is processed with OpenCV on the laptop to detect face position, and the smile. The tip of a tube is constantly directed at the person using a 2-degree-of-freedom servo-controlled manipulator. To load the spray gun, a peristaltic pump is activated while a servo-controlled Valve is closed to increase the pressure. If no smile is detected for 10 seconds, The valve is opened to release water from the needle tip.
